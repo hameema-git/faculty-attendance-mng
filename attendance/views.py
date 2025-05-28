@@ -810,4 +810,10 @@ def view_attendance_detail(request, attendance_id):
     attendance = get_object_or_404(Attendance, id=attendance_id)
     return render(request, 'attendance/view_attendance_detail.html', {'attendance': attendance})
 
+from django.core.management import call_command
+from django.http import HttpResponse
 
+
+def migrate_view(request):
+    call_command('migrate')
+    return HttpResponse("Migration completed.")

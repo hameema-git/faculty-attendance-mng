@@ -25,4 +25,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('attendance.urls')),
     path('', include('pwa.urls')),  # This adds manifest and service worker
+    
 ]
