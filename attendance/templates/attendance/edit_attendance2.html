@@ -1,0 +1,160 @@
+<!-- attendance/templates/attendance/edit_attendance.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Edit Attendance</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="manifest" href="{% static 'manifest.json' %}" />
+    <link rel="icon" href="{% static 'icons/icon-192x192.png' %}" />
+    <meta name="theme-color" content="#008080" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f5;
+            color: #222;
+            padding: 15px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+
+        h2 {
+            color: #008080;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        label.form-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-control, .form-select {
+            border-radius: 0.3rem;
+            border: 1px solid #ccc;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #008080;
+            box-shadow: 0 0 6px rgba(0, 128, 128, 0.3);
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: #008080;
+            border-color: #008080;
+        }
+
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: #006666;
+            border-color: #006666;
+        }
+
+        .btn-secondary {
+            background-color: #555;
+            border-color: #555;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover, .btn-secondary:focus {
+            background-color: #333;
+            border-color: #333;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Edit Attendance</h2>
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Optional: Include the date field if needed -->
+            <!--
+            <div class="mb-3">
+                <label for="id_date" class="form-label">Date:</label>
+                <input type="date" id="id_date" name="date" class="form-control" value="{{ attendance.date|date:'Y-m-d' }}" required>
+            </div>
+            -->
+
+            <div class="mb-3">
+                <label for="id_status" class="form-label">Status:</label>
+                <select id="id_status" name="status" class="form-select" required>
+                    <option value="P" {% if attendance.status == 'P' %}selected{% endif %}>Present</option>
+                    <option value="A" {% if attendance.status == 'A' %}selected{% endif %}>Absent</option>
+                    <option value="L" {% if attendance.status == 'L' %}selected{% endif %}>Leave</option>
+                    <option value="OL" {% if attendance.status == 'OL' %}selected{% endif %}>Optional Leave</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="id_hours_worked" class="form-label">Hours Worked:</label>
+                <input type="number" id="id_hours_worked" name="hours_worked" class="form-control" value="{{ attendance.hours_worked }}" step="0.01" min="0">
+            </div>
+
+            <div class="mb-3">
+                <label for="id_message" class="form-label">Message:</label>
+                <textarea id="id_message" name="message" class="form-control" rows="3">{{ attendance.message }}</textarea>
+            </div>
+
+            <!-- Optional: Include approved field if needed -->
+            <!--
+            <div class="mb-3">
+                <label for="id_approved" class="form-label">Approved:</label>
+                <select id="id_approved" name="approved" class="form-select">
+                    <option value="True" {% if attendance.approved %}selected{% endif %}>Yes</option>
+                    <option value="False" {% if not attendance.approved %}selected{% endif %}>No</option>
+                </select>
+            </div>
+            -->
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Update Attendance</button>
+                <a href="{% url 'faculty_attendance_history' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const statusField = document.querySelector('select[name="status"]');
+            const hoursField = document.querySelector('input[name="hours_worked"]');
+
+            function checkStatusAndSetHours() {
+                const status = statusField.value;
+                if (status === 'A' || status === 'L' || status === 'OL') {
+                    hoursField.value = '0.00';
+                    hoursField.readOnly = true;
+                } else {
+                    hoursField.readOnly = false;
+                }
+            }
+
+            statusField.addEventListener('change', checkStatusAndSetHours);
+            checkStatusAndSetHours(); // Initial call on page load
+        });
+    </script>
+</body>
+</html>

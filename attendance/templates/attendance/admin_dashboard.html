@@ -1,0 +1,175 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            padding: 30px;
+        }
+        .dashboard {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .menu {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .menu a {
+            display: block;
+            padding: 15px;
+            text-align: center;
+            background: #4a90e2;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .menu a:hover {
+            background: #357ABD;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Welcome, Admin</h1>
+        <p style="text-align:center;">Manage faculty attendance system efficiently</p>
+
+        <div class="menu">
+            <a href="{% url 'admin_view_faculty' %}">View All Faculty</a>
+            <a href="{% url 'admin_view_attendance' %}">View Attendance Records</a>
+            <a href="{% url 'admin_add_faculty' %}">Add New Faculty</a>
+            <a href="{% url 'admin_approve_attendance' %}">Approve Attendance</a> 👈 New Icon -->
+            <!-- <a href="{% url 'attendance_summary' %}" >Attendance Summary</a>
+
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+    </div>
+</body>
+</html> -->
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Admin Dashboard - Faculty Attendance</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="manifest" href="{% static 'manifest.json' %}" />
+    <link rel="icon" href="{% static 'icons/icon-192x192.png' %}" />
+    <meta name="theme-color" content="#008080" />
+
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+    <!-- Bootstrap CSS CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f5;
+            color: #222;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            background: white;
+            padding: 2.5rem 2.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 520px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #008080;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            user-select: none;
+        }
+
+        p.lead {
+            color: #555;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .menu {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .menu a {
+            display: block;
+            background-color: #008080;
+            color: white;
+            padding: 12px 0;
+            border-radius: 0.4rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            user-select: none;
+        }
+
+        .menu a:hover,
+        .menu a:focus {
+            background-color: #006666;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Welcome {{ request.user.username }}</h1>
+        <!-- <p class="lead">Manage faculty attendance system efficiently</p> -->
+         <br>
+
+        <!-- <div class="menu" role="navigation" aria-label="Admin dashboard menu">
+            <a href="{% url 'admin_view_faculty' %}">View All Faculty</a>
+            <a href="{% url 'admin_view_attendance' %}">View Attendance Records</a>
+            <a href="{% url 'admin_add_faculty' %}">Add New Faculty</a>
+            <a href="{% url 'admin_approve_attendance' %}">Approve Attendance</a>
+            <a href="{% url 'attendance_summary' %}">Attendance Summary</a>
+            <a href="{% url 'logout' %}">🚪 Logout</a>
+        </div> -->
+
+        <div class="menu" role="navigation" aria-label="Admin dashboard menu">
+            <a href="{% url 'admin_view_faculty' %}">👨‍🏫 View All Faculty</a>
+            <a href="{% url 'admin_view_attendance' %}">📋 View Attendance Records</a>
+            <a href="{% url 'admin_add_faculty' %}">➕ Add New Faculty</a>
+            <a href="{% url 'admin_approve_attendance' %}">✅ Approve Attendance</a>
+            <a href="{% url 'attendance_summary' %}">📊 Attendance Summary</a>
+            <a href="{% url 'logout' %}">🚪 Logout</a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
