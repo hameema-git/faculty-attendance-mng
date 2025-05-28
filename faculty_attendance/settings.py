@@ -53,6 +53,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = "faculty_attendance.urls"
@@ -189,4 +190,8 @@ SECRET_KEY = os.getenv("SECRET_KEY", "your-default-secret")  # Use env var or fa
 
 # ALLOWED_HOSTS = ["*"]  # For now, Render sets it automatically, keep "*"
 DEBUG = True
+
+# In production only:
+if not DEBUG:
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
