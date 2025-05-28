@@ -185,7 +185,8 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 SECRET_KEY = os.getenv("SECRET_KEY", "your-default-secret")  # Use env var or fallback
 
-DEBUG = os.getenv("DEBUG", "False") == "True"  # Defaults to False
+# DEBUG = os.getenv("DEBUG", "False") == "True"  # Defaults to False
 
 # ALLOWED_HOSTS = ["*"]  # For now, Render sets it automatically, keep "*"
+DEBUG = True
 
