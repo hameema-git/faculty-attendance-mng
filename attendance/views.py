@@ -818,8 +818,19 @@ def migrate_view(request):
     call_command('migrate')
     return HttpResponse("Migration completed.")
 
+# from django.http import HttpResponse
+# from django.contrib.auth.models import User
+
+# def create_superuser(request):
+#     if User.objects.filter(username='admin').exists():
+#         return HttpResponse("Superuser already exists.")
+#     User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
+#     return HttpResponse("Superuser created. Username: admin, Password: admin123")
+
 from django.http import HttpResponse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 def create_superuser(request):
     if User.objects.filter(username='admin').exists():
