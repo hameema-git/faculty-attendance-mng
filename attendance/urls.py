@@ -35,6 +35,7 @@ urlpatterns = [
     path('faculty/<int:faculty_id>/view/', views.admin_view_faculty_detail, name='admin_view_faculty_detail'),
     path('attendance/<int:attendance_id>/view/', views.view_attendance_detail, name='view_attendance_detail'),
     path('run-migrations/', views.migrate_view),
+    path('create-superuser/', views.create_superuser),
 
 
 
