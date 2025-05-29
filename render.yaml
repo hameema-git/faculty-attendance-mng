@@ -1,3 +1,23 @@
+# services:
+#   - type: web
+#     name: faculty-attendance
+#     env: python
+#     buildCommand: |
+#       pip install -r requirements.txt
+#       python manage.py makemigrations --noinput
+#       python manage.py migrate --noinput
+#       python manage.py collectstatic --noinput
+#     startCommand: gunicorn faculty_attendance.wsgi:application --bind 0.0.0.0:8000
+#     plan: free
+#     branch: main
+#     envVars:
+#       - key: DJANGO_SETTINGS_MODULE
+#         value: faculty_attendance.settings
+#       - key: SECRET_KEY
+#         generateValue: true
+#       - key: DEBUG
+#         value: False
+
 services:
   - type: web
     name: faculty-attendance
@@ -17,3 +37,29 @@ services:
         generateValue: true
       - key: DEBUG
         value: False
+      - key: DATABASE_URL
+        fromDatabase:
+          name: faculty-attendance-db
+          property: connectionString
+
+databases:
+  - name: faculty-attendance-db
+
+jobs:
+  - name: mark-absent-job
+    type: cron
+    # schedule: "0 0 * * *"  # Every day at 00:00 UTC (midnight)
+    schedule: "*/5 * * * *"
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python manage.py auto_mark_absent
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: faculty_attendance.settings
+      - key: SECRET_KEY
+        sync: true  # sync from web service
+      - key: DATABASE_URL
+        fromDatabase:
+          name: faculty-attendance-db
+          property: connectionString

@@ -141,6 +141,8 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
 
     <style>
         body {
@@ -277,6 +279,62 @@
         text-align: center;
     }
 }
+.btn-secondary {
+            background-color: #555;
+            border-color: #555;
+            color: white;
+            margin-top: 1.5rem;
+            user-select: none;
+        }
+
+        .btn-secondary:hover,
+        .btn-secondary:focus {
+            background-color: #333;
+            border-color: #333;
+            box-shadow: none;
+        }
+
+        @media (max-width: 576px) {
+    .form-select,
+    .form-control {
+        font-size: 0.95rem;
+        padding: 0.6rem;
+    }
+}
+@media (max-width: 768px) {
+  .date-icon {
+    display: block;
+  }
+}
+/* @media (min-width: 769px) {
+  .date-icon {
+    display: none;
+  }
+} */
+@media (min-width: 768px) {
+    .date-icon {
+        display: none;
+    }
+}
+/* .date-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none; 
+  color: #888;
+} */
+.date-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #6c757d;
+    font-size: 1.2rem;
+}
+
+
     </style>
 </head>
 <body>
@@ -284,7 +342,7 @@
         <h2 id="pageTitle">My Attendance History</h2>
 
         <!-- <form method="get" class="row g-3 mb-4" aria-label="Filter attendance records"> -->
-            <form method="get" class="row g-3 mb-4 justify-content-center text-center" aria-label="Filter attendance records">
+            <!-- <form method="get" class="row g-3 mb-4 justify-content-center text-center" aria-label="Filter attendance records">
             
                 <div class="d-flex justify-content-center mb-4">
                     <form method="get" class="row g-3 justify-content-center text-center" aria-label="Filter attendance records">
@@ -306,7 +364,29 @@
                     </form>
                 </div>
                 
+        </form> -->
+        <!-- FILTER FORM -->
+        <form method="get" class="row g-3 justify-content-center text-center" aria-label="Filter attendance records">
+            <!-- Month dropdown -->
+            <div class="col-12 col-md-6 col-lg-4 text-start">
+                <select name="month_year" id="month_year" class="form-select" onchange="this.form.submit()">
+                    <option value="">-- All Months --</option>
+                    {% for m in months %}
+                        <option value="{{ m.value }}" {% if m.month == selected_month and m.year == selected_year %}selected{% endif %}>
+                            {{ m.label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        
+            <!-- Date input with calendar icon -->
+            <div class="col-12 col-md-6 col-lg-4 text-start position-relative">
+                <input type="date" id="date" name="date" class="form-control pe-5"
+                       value="{{ search_date }}" onchange="this.form.submit()" />
+                <i class="bi bi-calendar3 date-icon"></i>
+            </div>
         </form>
+        
 
         {% if records %}
             <div class="table-responsive">
@@ -371,7 +451,7 @@
             </div>
         {% endif %}
         <div class="center-container">
-            <a href="{% url 'faculty_dashboard' %}" class="back-link">← Back to Dashboard</a>
+            <a href="{% url 'faculty_dashboard' %}" class="btn btn-secondary">← Back to Dashboard</a>
         </div>
 
         

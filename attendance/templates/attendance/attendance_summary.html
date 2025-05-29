@@ -100,6 +100,8 @@
 <html>
 <head>
     <title>Attendance Summary</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
     <style>
@@ -197,6 +199,14 @@
         form.row.mb-4.justify-content-center > div {
             margin-bottom: 0.5rem;
         }
+        @media (max-width: 576px) {
+    form.row.mb-4 .form-select,
+    form.row.mb-4 .btn {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -207,7 +217,9 @@
         <div class="col-md-4">
             <input type="text" name="q" class="form-control" placeholder="Search by faculty name..." value="{{ search_query }}">
         </div>
-        <div class="col-md-auto d-flex align-items-center gap-2">
+        <!-- <div class="col-md-auto d-flex align-items-center gap-2"> -->
+            <div class="col-md-auto d-flex flex-wrap align-items-center gap-2">
+
             <select name="month" class="form-select d-inline w-auto">
                 {% for m in months %}
                     <option value="{{ m.month }}" {% if m.month == selected_month and m.year == selected_year %}selected{% endif %}>
@@ -226,12 +238,12 @@
         <table class="table table-bordered align-middle shadow-sm">
             <thead class="table-primary">
                 <tr>
-                    <th>Faculty</th>
-                    <th>Present</th>
-                    <th>Absent</th>
-                    <th>Leave</th>
-                    <th>Total Hours Worked</th>
-                    <th>Working Days & Hours</th>
+                    <th style="background-color: #2a5656;color:white;">Faculty</th>
+                    <th style="background-color: #2a5656;color:white;">Present</th>
+                    <th style="background-color: #2a5656;color:white;">Absent</th>
+                    <th style="background-color: #2a5656;color:white;">Leave</th>
+                    <th style="background-color: #2a5656;color:white;">Total Hours Worked</th>
+                    <th style="background-color: #2a5656;color:white;">Working Days & Hours</th>
                 </tr>
             </thead>
             <tbody>
