@@ -858,24 +858,25 @@ def run_auto_mark_absent(request):
     return JsonResponse({"status": "unauthorized"}, status=403)
 
 
+# from django.http import JsonResponse
+# import os
+
+# def run_job(request):
+#     token = request.headers.get("Authorization")
+#     expected_token = f"Bearer {os.getenv('SECRET_JOB_TOKEN', 'change-this-token')}"
+
+#     if token != expected_token:
+#         return JsonResponse({"error": "Unauthorized"}, status=401)
+
+#     from django.core.management import call_command
+#     call_command("auto_mark_absent")
+
+#     return JsonResponse({"status": "Job executed successfully"})
+
 from django.http import JsonResponse
 import os
 
-def run_job(request):
-    token = request.headers.get("Authorization")
-    expected_token = f"Bearer {os.getenv('SECRET_JOB_TOKEN', 'change-this-token')}"
-
-    if token != expected_token:
-        return JsonResponse({"error": "Unauthorized"}, status=401)
-
-    from django.core.management import call_command
-    call_command("auto_mark_absent")
-
-    return JsonResponse({"status": "Job executed successfully"})
-
-from django.http import JsonResponse
-import os
-
+@csrf_exempt
 def run_job(request):
     token = request.headers.get("Authorization")
     expected_token = f"Bearer {os.getenv('SECRET_JOB_TOKEN', 'change-this-token')}"
