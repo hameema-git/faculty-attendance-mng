@@ -580,6 +580,7 @@ def attendance_summary(request):
                 'date': record['date'],
                 'hours_worked': hours
             })
+            
 
         summary.append({
             'faculty': faculty,
@@ -837,3 +838,55 @@ def create_superuser(request):
         return HttpResponse("Superuser already exists.")
     User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
     return HttpResponse("Superuser created. Username: admin, Password: admin123")
+
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from django.core.management import call_command
+
+@csrf_exempt
+def run_auto_mark_absent(request):
+    if request.method == "POST":
+        token = request.headers.get("Authorization", "").replace("Bearer ", "")
+        if token == settings.SECRET_JOB_TOKEN:
+            try:
+                call_command("auto_mark_absent")
+                return JsonResponse({"status": "success"})
+            except Exception as e:
+                return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    return JsonResponse({"status": "unauthorized"}, status=403)
+
+
+from django.http import JsonResponse
+import os
+
+def run_job(request):
+    token = request.headers.get("Authorization")
+    expected_token = f"Bearer {os.getenv('SECRET_JOB_TOKEN', 'change-this-token')}"
+
+    if token != expected_token:
+        return JsonResponse({"error": "Unauthorized"}, status=401)
+
+    from django.core.management import call_command
+    call_command("auto_mark_absent")
+
+    return JsonResponse({"status": "Job executed successfully"})
+
+from django.http import JsonResponse
+import os
+
+def run_job(request):
+    token = request.headers.get("Authorization")
+    expected_token = f"Bearer {os.getenv('SECRET_JOB_TOKEN', 'change-this-token')}"
+
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid method", "method": request.method}, status=405)
+
+    if token != expected_token:
+        return JsonResponse({"error": "Unauthorized", "received_token": token}, status=401)
+
+    from django.core.management import call_command
+    call_command("auto_mark_absent")
+
+    return JsonResponse({"status": "Job executed successfully"})

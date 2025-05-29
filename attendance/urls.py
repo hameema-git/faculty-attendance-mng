@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import run_job
 
 urlpatterns = [
     path('', views.home, name='home'),  # 👈 Home page
@@ -36,6 +37,8 @@ urlpatterns = [
     path('attendance/<int:attendance_id>/view/', views.view_attendance_detail, name='view_attendance_detail'),
     path('run-migrations/', views.migrate_view),
     path('create-superuser/', views.create_superuser),
+    path("run-job/", run_job),
+
 
 
 
