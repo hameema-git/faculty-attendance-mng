@@ -876,10 +876,28 @@ def run_auto_mark_absent(request):
 from django.http import JsonResponse
 import os
 
+# @csrf_exempt
+# def run_job(request):
+#     token = request.headers.get("Authorization")
+#     expected_token = f"Bearer {os.getenv('SECRET_JOB_TOKEN', 'change-this-token')}"
+
+#     if request.method != "POST":
+#         return JsonResponse({"error": "Invalid method", "method": request.method}, status=405)
+
+#     if token != expected_token:
+#         return JsonResponse({"error": "Unauthorized", "received_token": token}, status=401)
+
+#     from django.core.management import call_command
+#     call_command("auto_mark_absent")
+
+#     return JsonResponse({"status": "Job executed successfully"})
 @csrf_exempt
 def run_job(request):
     token = request.headers.get("Authorization")
     expected_token = f"Bearer {os.getenv('SECRET_JOB_TOKEN', 'change-this-token')}"
+    
+    print("Received token:", token)
+    print("Expected token:", expected_token)
 
     if request.method != "POST":
         return JsonResponse({"error": "Invalid method", "method": request.method}, status=405)
@@ -891,3 +909,4 @@ def run_job(request):
     call_command("auto_mark_absent")
 
     return JsonResponse({"status": "Job executed successfully"})
+
