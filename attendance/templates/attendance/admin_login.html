@@ -163,7 +163,7 @@
     <p class="error-message">{{ error }}</p>
     {% endif %}
 
-    <form method="post" novalidate>
+    <form method="post" novalidate id="loginForm">
         {% csrf_token %}
         <input type="text" name="username" placeholder="Username" autocomplete="username" required />
         
@@ -188,6 +188,12 @@
         icon.classList.toggle("bi-eye");
         icon.classList.toggle("bi-eye-slash");
     }
+       // Disable submit button after click
+       document.getElementById("loginForm").addEventListener("submit", function () {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Logging in...";
+    });
 </script>
 
 </body>
