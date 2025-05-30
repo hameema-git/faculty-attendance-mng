@@ -378,8 +378,14 @@ table td, table th {
                 {% for att in attendances %}
                 <tr>
                     <td class="text-center"><input type="checkbox" name="attendance_ids" value="{{ att.id }}"></td>
-                    <td>{{ att.faculty.username }}</td>
-                    <td>{{ att.date }}</td>
+                    <!-- <td>{{ att.faculty.username }}</td> -->
+                     <td><strong>{{ att.faculty.first_name }} {{ att.faculty.last_name }}</strong><br>
+                        <small class="text-muted">{{ att.faculty.username }}</small></td>
+                    <!-- <td>{{ att.date }}</td> -->
+                    <td>
+                        {{ att.date|date:"d M Y" }}<br>
+                        <small class="text-muted">{{ att.date|date:"l" }}</small>
+                      </td>
                     <td>
                         {% if att.status == "P" %} Present
                         {% elif att.status == "A" %} Absent

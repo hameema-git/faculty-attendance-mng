@@ -143,7 +143,7 @@ from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 
 def admin_view_attendance(request):
-    search_name = request.GET.get('name', '').strip()
+    # search_name = request.GET.get('name', '').strip()
     search_date = request.GET.get('date', '').strip()
     month_year = request.GET.get('month_year')
     selected_month = selected_year = None
@@ -154,8 +154,15 @@ def admin_view_attendance(request):
 
     attendance_list = Attendance.objects.filter(date__range=(academic_start, academic_end))
 
+    # if search_name:
+    #     attendance_list = attendance_list.filter(faculty__username__icontains=search_name)
+    search_name = request.GET.get('name', '').strip()
     if search_name:
-        attendance_list = attendance_list.filter(faculty__username__icontains=search_name)
+        attendance_list = attendance_list.filter(
+            Q(faculty__first_name__icontains=search_name) |
+            Q(faculty__last_name__icontains=search_name) |
+            Q(faculty__username__icontains=search_name)
+        )
 
     if search_date:
         attendance_list = attendance_list.filter(date=search_date)
@@ -227,7 +234,7 @@ from .models import Attendance,FacultyProfile
 from django.db.models import Q
 
 def admin_approve_attendance(request):
-    search_name = request.GET.get('name', '').strip()
+    # search_name = request.GET.get('name', '').strip()
     search_date = request.GET.get('date', '').strip()
     month_year = request.GET.get('month_year')
     selected_month = selected_year = None
@@ -238,8 +245,15 @@ def admin_approve_attendance(request):
 
     pending_attendance = Attendance.objects.filter(approved=False, date__range=(academic_start, academic_end))
 
+    # if search_name:
+    #     pending_attendance = pending_attendance.filter(faculty__username__icontains=search_name)
+    search_name = request.GET.get('name', '').strip()
     if search_name:
-        pending_attendance = pending_attendance.filter(faculty__username__icontains=search_name)
+        pending_attendance = pending_attendance.filter(
+            Q(faculty__first_name__icontains=search_name) |
+            Q(faculty__last_name__icontains=search_name) |
+            Q(faculty__username__icontains=search_name)
+        )
 
     if search_date:
         pending_attendance = pending_attendance.filter(date=search_date)

@@ -404,7 +404,13 @@
                     <tbody>
                         {% for att in records %}
                             <tr>
-                                <td>{{ att.date|date:"d M Y" }}</td>
+                                <!-- <td>{{ att.date|date:"d M Y" }}</td> -->
+                                <td>
+                                    {{ att.date|date:"d M Y" }}<br>
+                                    <small class="text-muted">{{ att.date|date:"l" }}</small>
+                                  </td>
+                                  
+
                                 <td>
                                     {% if att.status == "P" %}
                                         <span class="badge bg-success">Present</span>

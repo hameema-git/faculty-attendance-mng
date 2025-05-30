@@ -354,8 +354,15 @@
             <tbody>
             {% for record in attendance_list %}
                 <tr>
-                    <td>{{ record.date }}</td>
-                    <td>{{ record.faculty.first_name }} {{ record.faculty.last_name }}</td>
+                    <!-- <td>{{ record.date }}</td> -->
+                    <td>
+                        {{ record.date|date:"d M Y" }}<br>
+                        <small class="text-muted">{{ record.date|date:"l" }}</small>
+                      </td>
+                      
+                    <!-- <td>{{ record.faculty.first_name }} {{ record.faculty.last_name }}</td> -->
+                     <td><strong>{{ record.faculty.first_name }} {{ record.faculty.last_name }}</strong><br>
+                        <small class="text-muted">{{ record.faculty.username }}</small></td>
                     <td>
                         {% if record.status == "P" %} Present
                         {% elif record.status == "A" %} Absent
