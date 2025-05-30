@@ -26,6 +26,8 @@ urlpatterns = [
     # path('admin/delete_attendance/<int:attendance_id>/', views.delete_attendance, name='delete_attendance'),
     path('edit_attendance/<int:attendance_id>/', views.edit_attendance, name='edit_attendance'),
     path('delete_attendance/<int:attendance_id>/', views.delete_attendance, name='delete_attendance'),
+    path('delete_attendance1/<int:attendance_id>/', views.delete_attendance1, name='delete_attendance1'),
+    path('delete_attendance2/<int:attendance_id>/', views.delete_attendance2, name='delete_attendance2'),
     path('edit_attendance1/<int:attendance_id>/', views.edit_attendance1, name='edit_attendance1'),
     path('edit_attendance2/<int:attendance_id>/', views.edit_attendance2, name='edit_attendance2'),
    

@@ -368,7 +368,7 @@ table td, table th {
                     <th style="background-color: #2a5656;color:white;">Date</th>
                     <th style="background-color: #2a5656;color:white;">Status</th>
                     <th style="background-color: #2a5656;color:white;">Hours Worked</th>
-                    <th style="background-color: #2a5656;color:white;">Message</th>
+                    <th style="background-color: #2a5656;color:white;">Class Details</th>
                     <!-- <th class="text-center" style="background-color: #2a5656;color:white;">Actions</th> -->
                     <th class="text-center actions-header" style="background-color: #2a5656;color:white;">Actions</th>
 
@@ -397,8 +397,8 @@ table td, table th {
                     <td>{{ att.message|default:"-" }}</td>
                     <td class="actions-cell">
                         <a href="{% url 'edit_attendance' att.id %}" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="{% url 'delete_attendance' att.id %}" class="btn btn-danger btn-sm"
-                           onclick="return confirm('Are you sure you want to delete this attendance record?');">
+                        <a href="{% url 'delete_attendance2' att.id %}" class="btn btn-danger btn-sm"
+                           >
                            Delete
                         </a>
                     </td>

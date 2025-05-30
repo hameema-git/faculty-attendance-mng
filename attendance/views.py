@@ -380,10 +380,20 @@ def faculty_attendance_history(request):
     })
 
 
+# def admin_delete_faculty(request, user_id):
+#     user = get_object_or_404(CustomUser, id=user_id)
+#     user.delete()
+#     return redirect('admin_view_faculty')
+
+@login_required
 def admin_delete_faculty(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
-    user.delete()
-    return redirect('admin_view_faculty')
+    
+    if request.method == 'POST':
+        user.delete()
+        return redirect('admin_view_faculty')  # or use messages for confirmation
+
+    return render(request, 'attendance/confirm_delete_faculty.html', {'user': user})
 
 # def admin_edit_faculty(request, user_id):
 #     user = get_object_or_404(CustomUser, id=user_id)
@@ -747,10 +757,30 @@ def delete_attendance(request, attendance_id):
     if request.method == 'POST':
         attendance.delete()
         messages.success(request, "Attendance deleted successfully.")
-        return redirect('approve_attendance')
+        return redirect('faculty_attendance_history')
 
     return render(request, 'attendance/confirm_delete_attendance.html', {'attendance': attendance})
+@login_required
+def delete_attendance1(request, attendance_id):
+    attendance = get_object_or_404(Attendance, id=attendance_id)
+    
+    if request.method == 'POST':
+        attendance.delete()
+        messages.success(request, "Attendance deleted successfully.")
+        return redirect('admin_view_attendance')
 
+    return render(request, 'attendance/confirm_delete_attendance1.html', {'attendance': attendance})
+
+@login_required
+def delete_attendance2(request, attendance_id):
+    attendance = get_object_or_404(Attendance, id=attendance_id)
+    
+    if request.method == 'POST':
+        attendance.delete()
+        messages.success(request, "Attendance deleted successfully.")
+        return redirect('admin_approve_attendance')
+
+    return render(request, 'attendance/confirm_delete_attendance2.html', {'attendance': attendance})
 
 @login_required
 def mark_attendance_page(request):

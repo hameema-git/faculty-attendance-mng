@@ -135,7 +135,7 @@
             </td>
         </tr>
         <tr><th>Hours Worked</th><td>{{ attendance.hours_worked|default:"-" }}</td></tr>
-        <tr><th>Message</th><td>{{ attendance.message|default:"-" }}</td></tr>
+        <tr><th>Class Details</th><td>{{ attendance.message|default:"-" }}</td></tr>
         <tr><th>Approved</th><td>{% if attendance.approved %} ✅ {% else %} ❌ {% endif %}</td></tr>
     </table>
 
