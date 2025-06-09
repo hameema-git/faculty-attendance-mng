@@ -104,9 +104,31 @@
             padding: 1rem 0;
             user-select: none;
         }
+        .close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    color: #fff;
+    cursor: pointer;
+    z-index: 1000;
+    line-height: 1;
+    padding: 0;
+    transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+    color: #ffcccc;
+}
+
+
     </style>
 </head>
 <body>
+    <button class="close-btn" onclick="closeApp()" title="Close App">&times;</button>
+
 
 <header>Faculty Attendance System</header>
 
@@ -116,6 +138,8 @@
     <div class="btn-group mx-auto">
         <a href="{% url 'faculty_login' %}" class="btn btn-primary-custom btn-lg">Faculty Login</a>
         <a href="{% url 'admin_login' %}" class="btn btn-outline-custom btn-lg">Admin Login</a>
+        
+
     </div>
 </main>
 
@@ -124,6 +148,19 @@
 </footer>
 
 <script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("{% static 'serviceworker.js' %}")
+            .then(reg => console.log("✅ Service Worker registered:", reg.scope))
+            .catch(err => console.error("❌ Service Worker registration failed:", err));
+    }
+    function closeApp() {
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+            window.open('', '_self').close();
+        } else {
+            alert("Please close the tab manually.");
+        }
+    }
+
     if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register("{% static 'serviceworker.js' %}")
             .then(reg => console.log("✅ Service Worker registered:", reg.scope))
