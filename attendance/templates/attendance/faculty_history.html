@@ -121,12 +121,12 @@
  -->
 
 
- {% load static %}
+ <!-- {% load static %} -->
  <!-- {% load custom_filters %} -->
 
 
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -135,13 +135,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="manifest" href="{% static 'manifest.json' %}" />
     <link rel="icon" href="{% static 'icons/icon-192x192.png' %}" />
-    <meta name="theme-color" content="#008080" />
+    <meta name="theme-color" content="#008080" /> -->
 
     <!-- Google Fonts: Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" /> -->
 
     <!-- Bootstrap CSS CDN -->
-    <link
+    <!-- <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
@@ -343,7 +343,7 @@
 </head>
 <body>
     <main class="container" role="main" aria-labelledby="pageTitle">
-        <h2 id="pageTitle">My Attendance History</h2>
+        <h2 id="pageTitle">My Attendance History</h2> -->
 
         <!-- <form method="get" class="row g-3 mb-4" aria-label="Filter attendance records"> -->
             <!-- <form method="get" class="row g-3 mb-4 justify-content-center text-center" aria-label="Filter attendance records">
@@ -370,9 +370,9 @@
                 
         </form> -->
         <!-- FILTER FORM -->
-        <form method="get" class="row g-3 justify-content-center text-center" aria-label="Filter attendance records">
+        <!-- <form method="get" class="row g-3 justify-content-center text-center" aria-label="Filter attendance records"> -->
             <!-- Month dropdown -->
-            <div class="col-12 col-md-6 col-lg-4 text-start">
+            <!-- <div class="col-12 col-md-6 col-lg-4 text-start">
                 <select name="month_year" id="month_year" class="form-select" onchange="this.form.submit()">
                     <option value="">-- All Months --</option>
                     {% for m in months %}
@@ -381,10 +381,10 @@
                         </option>
                     {% endfor %}
                 </select>
-            </div>
+            </div> -->
         
             <!-- Date input with calendar icon -->
-            <div class="col-12 col-md-6 col-lg-4 text-start position-relative">
+            <!-- <div class="col-12 col-md-6 col-lg-4 text-start position-relative">
                 <input type="date" id="date" name="date" class="form-control pe-5"
                        value="{{ search_date }}" onchange="this.form.submit()" />
                 <i class="bi bi-calendar3 date-icon"></i>
@@ -407,9 +407,9 @@
                     </thead>
                     <tbody>
                         {% for att in records %}
-                            <tr>
+                            <tr> -->
                                 <!-- <td>{{ att.date|date:"d M Y" }}</td> -->
-                                <td>
+                                <!-- <td>
                                     {{ att.date|date:"d M Y" }}<br>
                                     <small class="text-muted">{{ att.date|date:"l" }}</small>
                                   </td>
@@ -436,10 +436,10 @@
                                     {% endif %}
                                 </td>
                                 <td>{{ att.hours_worked|default:"-" }}</td>
-                                <td>{{ att.message|default:"-" }}</td>
+                                <td>{{ att.message|default:"-" }}</td> -->
                                 <!-- <td>{{ att.message|split_by_dot|safe }}</td> -->
 
-                                <td>
+                                <!-- <td>
                                     {% if not att.approved %}
                                         <div class="action-buttons d-flex justify-content-center">
                                             <a href="{% url 'edit_attendance2' att.id %}" class="btn btn-warning btn-sm" role="button" aria-label="Edit attendance for {{ att.date|date:'d M Y' }}">Edit</a>
@@ -468,6 +468,229 @@
 
         
     </main>
+</body>
+</html> -->
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Attendance History - Faculty Attendance</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- PWA & Icons -->
+  <link rel="manifest" href="{% static 'manifest.json' %}" />
+  <link rel="icon" href="{% static 'icons/icon-192x192.png' %}" />
+  <meta name="theme-color" content="#008080" />
+
+  <!-- Bootstrap & Icons -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+  <style>
+    /* Container & Typography */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f0f4f5;
+      padding: 20px;
+    }
+    .container {
+      background: #fff;
+      padding: 2.5rem;
+      border-radius: .75rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      max-width: 960px;
+      margin: auto;
+    }
+    h2 {
+      color: #008080;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    /* Filter Form */
+    form.row.g-3 {
+      margin-bottom: 2rem;
+      gap: 1rem;
+      justify-content: center;
+    }
+    .date-icon {
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      color: #6c757d;
+      pointer-events: none;
+    }
+
+    /* Table Styling */
+    table thead {
+      background: #e0f2f1;
+    }
+    thead th {
+      color: #00695c;
+      font-weight: 600;
+      text-align: center;
+    }
+    tbody tr:hover {
+      background: #f1f8f7;
+    }
+    .badge {
+      font-weight: 600;
+    }
+
+    /* Buttons & Pagination */
+    .btn-secondary {
+      background: #555;
+      color: #fff;
+      margin-top: 1.5rem;
+    }
+    .btn-secondary:hover {
+      background: #333;
+    }
+    @media (max-width:767px) {
+      form.row.g-3 {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container" role="main">
+    <h2>My Attendance History</h2>
+
+    <!-- Filter Form -->
+    <form method="get" class="row g-3">
+      <div class="col-md-6 col-lg-4 position-relative">
+        <select name="month_year" class="form-select" onchange="this.form.submit()">
+          <option value="">-- All Months --</option>
+          {% for m in months %}
+            <option value="{{ m.value }}"
+              {% if m.month == selected_month and m.year == selected_year %}selected{% endif %}>
+              {{ m.label }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6 col-lg-4 position-relative">
+        <input type="date" name="date" class="form-control pe-5"
+               value="{{ search_date }}" onchange="this.form.submit()" />
+        <i class="bi bi-calendar3 date-icon"></i>
+      </div>
+    </form>
+
+    {% if page_obj %}
+      <!-- Attendance Table -->
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle text-center">
+          <thead>
+            <tr>
+              <th style="background:#2a5656;color:#fff;">Date</th>
+              <th style="background:#2a5656;color:#fff;">Status</th>
+              <th style="background:#2a5656;color:#fff;">Approved</th>
+              <th style="background:#2a5656;color:#fff;">Hours</th>
+              <th style="background:#2a5656;color:#fff;">Details</th>
+              <th style="background:#2a5656;color:#fff;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for att in page_obj %}
+              <tr>
+                <td>
+                  {{ att.date|date:"d M Y" }}<br>
+                  <small class="text-muted">{{ att.date|date:"l" }}</small>
+                </td>
+                <td>
+                  {% if att.status == "P" %}
+                    <span class="badge bg-success">Present</span>
+                  {% elif att.status == "A" %}
+                    <span class="badge bg-danger">Absent</span>
+                  {% elif att.status == "L" %}
+                    <span class="badge bg-warning text-dark">Leave</span>
+                  {% elif att.status == "OL" %}
+                    <span class="badge bg-info text-dark">Opt. Leave</span>
+                  {% else %}
+                    {{ att.status }}
+                  {% endif %}
+                </td>
+                <td>
+                  {% if att.approved %}
+                    <span class="text-success">Yes</span>
+                  {% else %}
+                    <span class="text-danger">No</span>
+                  {% endif %}
+                </td>
+                <td>{{ att.hours_worked|default:"-" }}</td>
+                <td>{{ att.message|default:"-" }}</td>
+                <td>
+                  {% if not att.approved %}
+                    <a href="{% url 'edit_attendance2' att.id %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'delete_attendance' att.id %}" class="btn btn-danger btn-sm">Delete</a>
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Controls -->
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link"
+                 href="?page={{ page_obj.previous_page_number }}{% if search_date %}&amp;date={{ search_date }}{% endif %}"
+                 aria-label="Previous">&laquo;</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+              <li class="page-item">
+                <a class="page-link"
+                   href="?page={{ num }}{% if search_date %}&amp;date={{ search_date }}{% endif %}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link"
+                 href="?page={{ page_obj.next_page_number }}{% if search_date %}&amp;date={{ search_date }}{% endif %}"
+                 aria-label="Next">&raquo;</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% else %}
+      <div class="alert alert-info text-center">
+        No attendance records found.
+      </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="text-center">
+      <a href="{% url 'faculty_dashboard' %}" class="btn btn-secondary">
+        ← Back to Dashboard
+      </a>
+    </div>
+  </main>
 </body>
 </html>
 
