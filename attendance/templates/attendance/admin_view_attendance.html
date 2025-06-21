@@ -449,9 +449,10 @@
                    placeholder="Search by name" value="{{ search_name }}">
         </div>
         <div class="col-12 col-md-6 col-lg-4 position-relative">
-            <input type="date" id="date" name="date" class="form-control pe-5"
+            <input type="date" id="date" name="date" class="form-control pe-5" 
                    value="{{ search_date }}" onchange="this.form.submit()" />
-            <i class="bi bi-calendar3 date-icon"></i>
+                 
+            <!-- <i class="bi bi-calendar3 date-icon"></i> -->
         </div>
         <div class="col-md-4">
             <select name="month_year" class="form-select">
@@ -463,10 +464,11 @@
                     </option>
                 {% endfor %}
             </select>
+            <br>
         </div>
-        <div class="col-12 col-md-auto d-grid">
+        <!-- <div class="col-12 col-md-auto d-grid">
             <button type="submit" class="btn btn-primary">🔍 Search</button>
-        </div>
+        </div> -->
     </form>
 
     <!-- Attendance Table -->
