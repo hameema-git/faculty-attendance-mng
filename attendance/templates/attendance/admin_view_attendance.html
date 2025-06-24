@@ -443,17 +443,17 @@
     <h2>All Attendance Records</h2>
 
     <!-- Search Form -->
-    <form method="get" class="row g-3">
+    <!-- <form method="get" class="row g-3">
         <div class="col-md-4">
             <input type="text" name="name" class="form-control"
                    placeholder="Search by name" value="{{ search_name }}">
         </div>
         <div class="col-12 col-md-6 col-lg-4 position-relative">
             <input type="date" id="date" name="date" class="form-control pe-5" 
-                   value="{{ search_date }}" onchange="this.form.submit()" />
+                   value="{{ search_date }}" onchange="this.form.submit()" /> -->
                  
             <!-- <i class="bi bi-calendar3 date-icon"></i> -->
-        </div>
+        <!-- </div>
         <div class="col-md-4">
             <select name="month_year" class="form-select">
                 <option value="">-- Select Month-Year --</option>
@@ -465,10 +465,33 @@
                 {% endfor %}
             </select>
             <br>
-        </div>
+        </div> -->
         <!-- <div class="col-12 col-md-auto d-grid">
             <button type="submit" class="btn btn-primary">🔍 Search</button>
         </div> -->
+    <!-- </form> -->
+
+    <form method="get" class="row g-3">
+        <div class="col-md-4">
+            <input type="text" name="name" class="form-control"
+                   placeholder="Search by name" value="{{ search_name }}">
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 position-relative">
+            <input type="date" id="date" name="date" class="form-control pe-5" 
+                   value="{{ search_date }}" onchange="this.form.submit()" />
+        </div>
+        <div class="col-md-4">
+            <select name="month_year" class="form-select" onchange="this.form.submit()">
+                <option value="">-- Select Month-Year --</option>
+                {% for m in months %}
+                    <option value="{{ m.value }}"
+                        {% if m.month == selected_month and m.year == selected_year %}selected{% endif %}>
+                        {{ m.label }}
+                    </option>
+                {% endfor %}
+            </select>
+            <br>
+        </div>
     </form>
 
     <!-- Attendance Table -->
@@ -547,11 +570,14 @@
             <li class="page-item active"><span class="page-link">{{ num }}</span></li>
           {% else %}
             <li class="page-item">
-              <a class="page-link"
+              <!-- <a class="page-link"
                  href="?{% if search_name %}name={{ search_name }}&amp;{% endif %}
                        {% if search_date %}date={{ search_date }}&amp;{% endif %}
                        {% if selected_month %}month_year={{ selected_month }}-{{ selected_year }}&amp;{% endif %}
-                       page={{ num }}">{{ num }}</a>
+                       page={{ num }}">{{ num }}</a> -->
+                       <a class="page-link"
+   href="?{% if search_name %}name={{ search_name }}&{% endif %}{% if search_date %}date={{ search_date }}&{% endif %}{% if selected_month %}month_year={{ selected_month }}-{{ selected_year }}&{% endif %}page={{ num }}">{{ num }}</a>
+
             </li>
           {% endif %}
         {% endfor %}
