@@ -1,101 +1,3 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-    <title>Attendance Summary</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .table th, .table td { vertical-align: middle; text-align: center; }
-    </style>
-</head>
-<body>
-<div class="container mt-5">
-    <h2 class="mb-4 text-center">Attendance Summary ({{ month }})</h2> -->
-    <!-- Month/Year Filter -->
-<!-- <form method="get" class="row mb-4 justify-content-center">
-    <div class="col-md-4">
-        <input type="text" name="q" class="form-control" placeholder="Search by faculty name..." value="{{ search_query }}">
-    </div>
-    <div class="col-md-auto">
-        <select name="month" class="form-select d-inline w-auto">
-            {% for m in months %}
-                <option value="{{ m.month }}" {% if m.month == selected_month and m.year == selected_year %}selected{% endif %}>
-                    {{ m.label }}
-                </option>
-            {% endfor %}
-        </select>
-        <input type="hidden" name="year" value="{{ selected_year }}">
-        <button type="submit" class="btn btn-primary">🔍 Filter</button>
-        <a href="{% url 'attendance_summary' %}" class="btn btn-secondary">Reset</a>
-    </div>
-</form> -->
-
-
- 
-    <!-- Attendance Table -->
-    <!-- <div class="table-responsive">
-        <table class="table table-bordered align-middle shadow-sm">
-            <thead class="table-primary text-center">
-                <tr>
-                    <th>Faculty</th>
-                    <th>Present</th>
-                    <th>Absent</th>
-                    <th>Leave</th>
-                    <th>Total Hours Worked</th>
-                    <th>Working Days & Hours</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for item in summary %}
-                <tr>
-                    <td><strong>{{ item.faculty.first_name }} {{ item.faculty.last_name }}</strong><br><small class="text-muted">{{ item.faculty.username }}</small></td>
-                    <td>{{ item.present }}</td>
-                    <td>{{ item.absent }}</td>
-                    <td>{{ item.leave }}</td>
-                    <td>{{ item.total_hours }}</td>
-                    <td>
-                        {% if item.daily_hours %}
-                            <button class="btn btn-sm btn-outline-info" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ forloop.counter }}">
-                                📅 View Days
-                            </button>
-                            <div class="collapse mt-2" id="collapse-{{ forloop.counter }}">
-                                <table class="table table-sm table-bordered mt-2">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Hours</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for d in item.daily_hours %}
-                                        <tr>
-                                            <td>{{ d.date }}</td>
-                                            <td>{{ d.hours_worked }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        {% else %}
-                            <span class="text-muted">No data</span>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% empty %}
-                <tr><td colspan="6" class="text-center text-muted">No data found.</td></tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="text-center mt-4">
-        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">← Back to Dashboard</a>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html> -->
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -206,6 +108,66 @@
         margin-top: 0.5rem;
     }
 }
+/* Optional: Improve spacing on mobile */
+@media screen and (max-width: 480px) {
+  .page-item .page-link {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+/* Scrollable wrapper */
+.pagination-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  padding: 8px 0;
+}
+
+.pagination-scroll::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Pagination layout */
+.pagination {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.4rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Page link styles */
+.page-item .page-link {
+  min-width: 2.5rem;
+  text-align: center;
+  padding: 6px 12px;
+  text-decoration: none;
+  color: #007bff;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.page-item .page-link:hover {
+  background-color: #f1f1f1;
+}
+
+.page-item.active .page-link {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+  font-weight: bold;
+}
+
+.page-item.disabled .page-link {
+  color: #aaa;
+  pointer-events: none;
+  background-color: #f9f9f9;
+  border-color: #dee2e6;
+}
+
 
     </style>
 </head>
@@ -238,6 +200,7 @@
         <table class="table table-bordered align-middle shadow-sm">
             <thead class="table-primary">
                 <tr>
+                    <th style="background-color: #2a5656;color:white;">Sl No</th>
                     <th style="background-color: #2a5656;color:white;">Faculty</th>
                     <th style="background-color: #2a5656;color:white;">Present</th>
                     <th style="background-color: #2a5656;color:white;">Absent</th>
@@ -249,6 +212,9 @@
             <tbody>
             {% for item in summary %}
                 <tr>
+                    <!-- <td>{{ summary.start_index|add:forloop.counter0 }}</td> ✅ Correct serial number -->
+                    <td>{{ page_obj.start_index|add:forloop.counter0 }}</td>
+
                     <td>
                         <strong>{{ item.faculty.first_name }} {{ item.faculty.last_name }}</strong><br>
                         <small class="text-muted">{{ item.faculty.username }}</small>
@@ -291,6 +257,46 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}month={{ selected_month }}&year={{ selected_year }}&page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;</span>
+            </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}month={{ selected_month }}&year={{ selected_year }}&page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}month={{ selected_month }}&year={{ selected_year }}&page={{ page_obj.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
 
     <div class="text-center mt-4">
         <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">← Back to Dashboard</a>

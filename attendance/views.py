@@ -75,81 +75,28 @@ def custom_logout(request):
     return redirect('home')  # Or 'faculty_login' or 'admin_login' if you prefer
 
 
+# def admin_view_faculty(request):
+#     faculty_list = CustomUser.objects.filter(is_faculty=True)
+#     return render(request, 'attendance/admin_view_faculty.html', {'faculty_list': faculty_list})
+
+from django.core.paginator import Paginator
+from django.shortcuts import render
+from .models import CustomUser
+
+
+from django.core.paginator import Paginator
+
 def admin_view_faculty(request):
-    faculty_list = CustomUser.objects.filter(is_faculty=True)
-    return render(request, 'attendance/admin_view_faculty.html', {'faculty_list': faculty_list})
+    faculty_list = CustomUser.objects.filter(is_faculty=True).order_by('first_name')  # Optional: Order alphabetically
+    paginator = Paginator(faculty_list, 10)  # Show 10 faculty per page
 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
+    return render(request, 'attendance/admin_view_faculty.html', {
+        'page_obj': page_obj
+    })
 
-# from datetime import date, timedelta
-# from dateutil.relativedelta import relativedelta
-
-# def admin_view_attendance(request):
-#     # search_name = request.GET.get('name', '').strip()
-#     search_date = request.GET.get('date', '').strip()
-#     month_year = request.GET.get('month_year')
-#     selected_month = selected_year = None
-
-#     # Academic year: May 2025 to March 2026
-#     academic_start = date(2025, 5, 1)
-#     academic_end = date(2026, 3, 31)
-
-#     attendance_list = Attendance.objects.filter(date__range=(academic_start, academic_end))
-
-#     # if search_name:
-#     #     attendance_list = attendance_list.filter(faculty__username__icontains=search_name)
-#     search_name = request.GET.get('name', '').strip()
-#     if search_name:
-#         attendance_list = attendance_list.filter(
-#             Q(faculty__first_name__icontains=search_name) |
-#             Q(faculty__last_name__icontains=search_name) |
-#             Q(faculty__username__icontains=search_name)
-#         )
-
-#     if search_date:
-#         attendance_list = attendance_list.filter(date=search_date)
-#     elif month_year:
-#         try:
-#             selected_month, selected_year = map(int, month_year.split('-'))
-#             attendance_list = attendance_list.filter(
-#                 date__month=selected_month,
-#                 date__year=selected_year
-#             )
-#         except ValueError:
-#             pass
-#     else:
-#         # Default to current month if within academic year
-#         today = date.today()
-#         if academic_start <= today <= academic_end:
-#             selected_month = today.month
-#             selected_year = today.year
-#             attendance_list = attendance_list.filter(
-#                 date__month=selected_month,
-#                 date__year=selected_year
-#             )
-
-#     attendance_list = attendance_list.order_by('-date')
-
-#     # Generate academic year months: May 2025 to March 2026
-#     months = []
-#     current = academic_start
-#     while current <= academic_end:
-#         months.append({
-#             'month': current.month,
-#             'year': current.year,
-#             'label': current.strftime("%B %Y"),
-#             'value': f"{current.month}-{current.year}"
-#         })
-#         current += relativedelta(months=1)
-
-#     return render(request, 'attendance/admin_view_attendance.html', {
-#         'attendance_list': attendance_list,
-#         'search_name': search_name,
-#         'search_date': search_date,
-#         'months': months,
-#         'selected_month': selected_month,
-#         'selected_year': selected_year,
-#     })
 
 
 from datetime import date
@@ -187,11 +134,23 @@ def admin_view_attendance(request):
     # 5) Date or Month-Year filter
     if search_date:
         qs = qs.filter(date=search_date)
+    # elif month_year:
+    #     try:
+    #         m, y = map(int, month_year.split('-'))
+    #         selected_month, selected_year = m, y
+    #         qs = qs.filter(date__month=m, date__year=y)
+    #     except ValueError:
+    #         pass
+
     elif month_year:
         try:
             m, y = map(int, month_year.split('-'))
-            selected_month, selected_year = m, y
-            qs = qs.filter(date__month=m, date__year=y)
+            if 1 <= m <= 12 and 1900 <= y <= 2100:
+                selected_month, selected_year = m, y
+                qs = qs.filter(date__month=m, date__year=y)
+            else:
+                # Optional: set a message or redirect with warning
+                pass
         except ValueError:
             pass
     else:
@@ -205,7 +164,7 @@ def admin_view_attendance(request):
     qs = qs.order_by('-date')
 
     # 7) Pagination (10 records per page)
-    paginator   = Paginator(qs, 10)
+    paginator   = Paginator(qs, 9)
     page_number = request.GET.get('page', 1)
     try:
         page_obj = paginator.page(page_number)
@@ -250,24 +209,24 @@ def admin_add_faculty(request):
 from django.shortcuts import render, redirect
 from .models import Attendance,FacultyProfile
 
-
+from django.core.paginator import Paginator
+from django.shortcuts import render, redirect
 from django.db.models import Q
+from datetime import date
+from dateutil.relativedelta import relativedelta
+from .models import Attendance
 
 def admin_approve_attendance(request):
-    # search_name = request.GET.get('name', '').strip()
     search_date = request.GET.get('date', '').strip()
+    search_name = request.GET.get('name', '').strip()
     month_year = request.GET.get('month_year')
     selected_month = selected_year = None
 
-    # Academic Year Range: May 2025 – March 2026
     academic_start = date(2025, 5, 1)
     academic_end = date(2026, 3, 31)
 
     pending_attendance = Attendance.objects.filter(approved=False, date__range=(academic_start, academic_end))
 
-    # if search_name:
-    #     pending_attendance = pending_attendance.filter(faculty__username__icontains=search_name)
-    search_name = request.GET.get('name', '').strip()
     if search_name:
         pending_attendance = pending_attendance.filter(
             Q(faculty__first_name__icontains=search_name) |
@@ -287,7 +246,6 @@ def admin_approve_attendance(request):
         except ValueError:
             pass
     else:
-        # Default to current month if within academic year
         today = date.today()
         if academic_start <= today <= academic_end:
             selected_month = today.month
@@ -302,7 +260,12 @@ def admin_approve_attendance(request):
         Attendance.objects.filter(id__in=ids).update(approved=True)
         return redirect('admin_approve_attendance')
 
-    # Generate academic months (May 2025 – March 2026)
+    # Pagination
+    paginator = Paginator(pending_attendance.order_by('-date'), 5)  # Show 10 per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Generate academic months
     months = []
     current = academic_start
     while current <= academic_end:
@@ -315,7 +278,8 @@ def admin_approve_attendance(request):
         current += relativedelta(months=1)
 
     return render(request, 'attendance/admin_approve_attendance.html', {
-        'attendances': pending_attendance,
+        'attendances': page_obj,
+        'page_obj': page_obj,
         'search_name': search_name,
         'search_date': search_date,
         'months': months,
@@ -335,66 +299,6 @@ def faculty_dashboard(request):
 
 from datetime import date,datetime
 from dateutil.relativedelta import relativedelta
-
-# @login_required
-# def faculty_attendance_history(request):
-#     month_year = request.GET.get('month_year')
-#     search_date = request.GET.get('date', '').strip()
-
-#     # Academic year range
-#     academic_start = date(2025, 5, 1)
-#     academic_end = date(2026, 5, 31)
-
-#     records = Attendance.objects.filter(
-#         faculty=request.user,
-#         date__range=(academic_start, academic_end)
-#     )
-
-#     selected_month = selected_year = None
-
-#     if search_date:
-#         try:
-#             search_date_obj = datetime.strptime(search_date, '%Y-%m-%d').date()
-#             records = records.filter(date=search_date_obj)
-#         except ValueError:
-#             pass
-
-#     elif month_year:
-#         try:
-#             selected_month, selected_year = map(int, month_year.split('-'))
-#             records = records.filter(date__month=selected_month, date__year=selected_year)
-#         except ValueError:
-#             pass
-
-#     else:
-#         # Default to current month if no filters applied
-#         today = date.today()
-#         if academic_start <= today <= academic_end:
-#             selected_month = today.month
-#             selected_year = today.year
-#             records = records.filter(date__month=selected_month, date__year=selected_year)
-
-#     records = records.order_by('-date')
-
-#     # Generate academic year month list (June 2025 to May 2026)
-#     months = []
-#     current = academic_start
-#     while current <= academic_end:
-#         months.append({
-#             'month': current.month,
-#             'year': current.year,
-#             'label': current.strftime("%B %Y"),
-#             'value': f"{current.month}-{current.year}"
-#         })
-#         current += relativedelta(months=1)
-
-#     return render(request, "attendance/faculty_history.html", {
-#         'records': records,
-#         'months': months,
-#         'selected_month': selected_month,
-#         'selected_year': selected_year,
-#         'search_date': search_date,
-#     })
 
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
@@ -449,7 +353,7 @@ def faculty_attendance_history(request):
     qs = qs.order_by('-date')
 
     # Paginate: 5 records per page
-    paginator   = Paginator(qs, 5)
+    paginator   = Paginator(qs, 7)
     page_number = request.GET.get('page', 1)
     try:
         page_obj = paginator.page(page_number)
@@ -549,14 +453,16 @@ from dateutil.relativedelta import relativedelta
 from django.db.models import Q
 from .models import Attendance, CustomUser
 
+
+
+from django.core.paginator import Paginator
+
 def attendance_summary(request):
     today = date.today()
 
-    # Academic year: May 2025 to March 2026
     academic_start = date(2025, 5, 1)
     academic_end = date(2026, 3, 31)
 
-    # Get selected month/year or default to current (only if within academic year)
     try:
         selected_month = int(request.GET.get('month', today.month))
         selected_year = int(request.GET.get('year', today.year))
@@ -564,14 +470,12 @@ def attendance_summary(request):
         selected_month = today.month
         selected_year = today.year
 
-    # If current date is outside academic year, default to May 2025
     if not (academic_start <= date(selected_year, selected_month, 1) <= academic_end):
         selected_month = 5
         selected_year = 2025
 
     faculty_users = CustomUser.objects.filter(is_faculty=True)
 
-    # Search
     search_query = request.GET.get('q', '').strip()
     if search_query:
         faculty_users = faculty_users.filter(
@@ -623,7 +527,6 @@ def attendance_summary(request):
                 'date': record['date'],
                 'hours_worked': hours
             })
-            
 
         summary.append({
             'faculty': faculty,
@@ -634,7 +537,11 @@ def attendance_summary(request):
             'daily_hours': daily_hours
         })
 
-    # Build dropdown months only from academic year range
+    # Pagination
+    paginator = Paginator(summary, 10)# 10 records per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     months = []
     current = academic_start
     while current <= academic_end:
@@ -647,13 +554,15 @@ def attendance_summary(request):
         current += relativedelta(months=1)
 
     return render(request, 'attendance/attendance_summary.html', {
-        'summary': summary,
+        'page_obj': page_obj,
+        'summary': page_obj.object_list,  # only the current page's data
         'month': datetime(selected_year, selected_month, 1).strftime("%B %Y"),
         'months': months,
         'selected_month': selected_month,
         'selected_year': selected_year,
-        'search_query': search_query
+        'search_query': search_query,
     })
+
 
 
 
