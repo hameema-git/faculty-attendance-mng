@@ -624,7 +624,7 @@
                     <th style="background-color:#2a5656;color:white;">Faculty</th>
                     <th style="background-color:#2a5656;color:white;">Status</th>
                     <th style="background-color:#2a5656;color:white;">Hours Worked</th>
-                    <th style="background-color:#2a5656;color:white;">Class Details</th>
+                    <!-- <th style="background-color:#2a5656;color:white;">Class Details</th> -->
                     <th style="background-color:#2a5656;color:white;">Approved</th>
                     <th style="background-color:#2a5656;color:white;">Actions</th>
                 </tr>
@@ -648,7 +648,7 @@
                         {% else %}Unknown{% endif %}
                     </td>
                     <td>{{ record.hours_worked|default:"-" }}</td>
-                    <td>{{ record.message|split_by_dot|safe }}</td>
+                    <!-- <td>{{ record.message|split_by_dot|safe }}</td> -->
                     <td>{% if record.approved %}✅{% else %}❌{% endif %}</td>
                     <td class="d-flex justify-content-center gap-2">
                         <a href="{% url 'view_attendance_detail' record.id %}"

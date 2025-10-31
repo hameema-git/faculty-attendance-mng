@@ -668,7 +668,7 @@
               <th style="background:#2a5656;color:#fff;">Status</th>
               <th style="background:#2a5656;color:#fff;">Approved</th>
               <th style="background:#2a5656;color:#fff;">Hours</th>
-              <th style="background:#2a5656;color:#fff;">Details</th>
+              <!-- <th style="background:#2a5656;color:#fff;">Details</th> -->
               <th style="background:#2a5656;color:#fff;">Action</th>
             </tr>
           </thead>
@@ -700,8 +700,9 @@
                   {% endif %}
                 </td>
                 <td>{{ att.hours_worked|default:"-" }}</td>
-                <td>{{ att.message|default:"-" }}</td>
+                <!-- <td>{{ att.message|default:"-" }}</td> -->
                 <td>
+                  <a href="{% url 'view_attendance' att.id %}" class="btn btn-info btn-sm">View</a>
                   {% if not att.approved %}
                     <a href="{% url 'edit_attendance2' att.id %}" class="btn btn-warning btn-sm">Edit</a>
                     <a href="{% url 'delete_attendance' att.id %}" class="btn btn-danger btn-sm">Delete</a>

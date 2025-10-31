@@ -1,104 +1,182 @@
+{% extends "attendance/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <title>Admin Dashboard - Faculty Attendance</title>
+{% block title %}Faculty Attendance Dashboard{% endblock %}
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="manifest" href="{% static 'manifest.json' %}" />
-    <link rel="icon" href="{% static 'icons/icon-192x192.png' %}" />
-    <meta name="theme-color" content="#008080" />
+{% block content %}
+<div class="dashboard-container">
+    <h2 class="dashboard-title">Faculty Attendance Dashboard</h2>
+    <p class="welcome-text">Welcome, {{ request.user.username }}! Manage all faculty and attendance activities here.</p>
 
-    <!-- Google Fonts: Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <div class="dashboard-grid">
+        <!-- 🔹 Row 1 -->
+        <a href="{% url 'admin_view_faculty' %}" class="dashboard-card info">
+            <i class="bi bi-people-fill"></i>
+            <span>View All Faculty</span>
+        </a>
 
-    <!-- Bootstrap CSS CDN -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+        <a href="{% url 'admin_add_faculty' %}" class="dashboard-card success">
+            <i class="bi bi-person-plus"></i>
+            <span>Add New Faculty</span>
+        </a>
 
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f0f4f5;
-            color: #222;
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+        <a href="{% url 'admin_view_attendance' %}" class="dashboard-card primary">
+            <i class="bi bi-clipboard-data"></i>
+            <span>View Attendance</span>
+        </a>
 
-        .dashboard-container {
-            background: white;
-            padding: 2.5rem 2.5rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 520px;
-            text-align: center;
-        }
+        <!-- 🔹 Row 2 (Centered) -->
+        <div class="row-2">
+            <a href="{% url 'admin_approve_attendance' %}" class="dashboard-card warning">
+                <i class="bi bi-check2-square"></i>
+                <span>Approve Attendance</span>
+            </a>
 
-        h1 {
-            color: #008080;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            user-select: none;
-        }
-
-        p.lead {
-            color: #555;
-            margin-bottom: 2rem;
-            font-weight: 500;
-        }
-
-        .menu {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .menu a {
-            display: block;
-            background-color: #008080;
-            color: white;
-            padding: 12px 0;
-            border-radius: 0.4rem;
-            font-weight: 600;
-            font-size: 1.1rem;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-            user-select: none;
-        }
-
-        .menu a:hover,
-        .menu a:focus {
-            background-color: #006666;
-            outline: none;
-        }
-    </style>
-</head>
-<body>
-    <div class="dashboard-container">
-        <h1>Welcome {{ request.user.username }}</h1>
-        <!-- <p class="lead">Manage faculty attendance system efficiently</p> -->
-         <br>
-
-
-        <div class="menu" role="navigation" aria-label="Admin dashboard menu">
-            <a href="{% url 'admin_view_faculty' %}">👨‍🏫 View All Faculty</a>
-            <a href="{% url 'admin_view_attendance' %}">📋 View Attendance Records</a>
-            <a href="{% url 'admin_add_faculty' %}">➕ Add New Faculty</a>
-            <a href="{% url 'admin_approve_attendance' %}">✅ Approve Attendance</a>
-            <a href="{% url 'attendance_summary' %}">📊 Attendance Summary</a>
-            <a href="{% url 'logout' %}">🚪 Logout</a>
+            <a href="{% url 'attendance_summary' %}" class="dashboard-card info">
+                <i class="bi bi-bar-chart-line"></i>
+                <span>Attendance Summary</span>
+            </a>
         </div>
     </div>
-</body>
-</html>
+
+    <hr>
+
+    <a href="{% url 'logout' %}" class="logout-btn">
+        <i class="bi bi-box-arrow-right"></i> Log Out
+    </a>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #e0f7fa, #f1f8f9);
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .dashboard-container {
+        width: 95%;
+        max-width: 1000px;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin-top: 2rem;
+        text-align: center;
+    }
+
+    .dashboard-title {
+        color: #008080;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .welcome-text {
+        color: #444;
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    /* 🌟 Grid Layout */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.2rem;
+        margin-bottom: 2rem;
+        justify-items: center;
+    }
+
+    .row-2 {
+        grid-column: 1 / span 3;
+        display: flex;
+        justify-content: center;
+        gap: 1.2rem;
+    }
+
+    .dashboard-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 1.5rem;
+        border-radius: 12px;
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        width: 100%;
+        max-width: 220px;
+    }
+
+    .dashboard-card i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* 🎨 Color Theme (same as Admin Dashboard) */
+    .dashboard-card.info { background-color: #17a2b8; }
+    .dashboard-card.success { background-color: #20c997; }
+    .dashboard-card.warning { background-color: #ffc107; color: #333; }
+    .dashboard-card.primary { background-color: #007bff; }
+
+    .dashboard-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+
+    .logout-btn {
+        display: inline-block;
+        background-color: #dc3545;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .logout-btn:hover {
+        background-color: #bb2d3b;
+    }
+
+    /* 📱 Mobile Responsive */
+    @media (max-width: 768px) {
+        .dashboard-container {
+            width: 95%;
+            padding: 1.5rem;
+        }
+        .dashboard-title {
+            font-size: 1.8rem;
+        }
+        .dashboard-card {
+            padding: 1.2rem;
+        }
+        .dashboard-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .row-2 {
+            grid-column: 1 / span 2;
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+        .row-2 {
+            grid-column: 1;
+        }
+    }
+</style>
+{% endblock %}
+
+
 
 
 

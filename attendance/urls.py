@@ -21,13 +21,20 @@ urlpatterns = [
     path('faculty/edit/<int:user_id>/', views.admin_edit_faculty, name='admin_edit_faculty'),
     path('faculty/delete/<int:user_id>/', views.admin_delete_faculty, name='admin_delete_faculty'),
     path('attendance-summary/', views.attendance_summary, name='attendance_summary'),
+
+    path('attendance-summary/pdf/', views.attendance_summary_pdf, name='attendance_summary_pdf'),
+    path('attendance-summary/excel/', views.attendance_summary_excel, name='attendance_summary_excel'),
     path('mark-attendance/', views.mark_attendance, name='mark_attendance'),
+    path('mark-leave-page/', views.mark_leave_page, name='mark_leave_page'),
+    path('mark-leave/', views.mark_leave, name='mark_leave'),
     # path('admin/edit_attendance/<int:attendance_id>/', views.edit_attendance, name='edit_attendance'),
     # path('admin/delete_attendance/<int:attendance_id>/', views.delete_attendance, name='delete_attendance'),
     path('edit_attendance/<int:attendance_id>/', views.edit_attendance, name='edit_attendance'),
     path('delete_attendance/<int:attendance_id>/', views.delete_attendance, name='delete_attendance'),
     path('delete_attendance1/<int:attendance_id>/', views.delete_attendance1, name='delete_attendance1'),
     path('delete_attendance2/<int:attendance_id>/', views.delete_attendance2, name='delete_attendance2'),
+    path('attendance/view/<int:attendance_id>/', views.view_attendance, name='view_attendance'),
+
     path('edit_attendance1/<int:attendance_id>/', views.edit_attendance1, name='edit_attendance1'),
     path('edit_attendance2/<int:attendance_id>/', views.edit_attendance2, name='edit_attendance2'),
    

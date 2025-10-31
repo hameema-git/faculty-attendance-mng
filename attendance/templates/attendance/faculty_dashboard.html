@@ -148,6 +148,9 @@
 
         <nav class="menu" aria-label="Faculty dashboard menu">
             <a href="{% url 'mark_attendance_page' %}">📥 Mark Today’s Attendance</a>
+            <!-- <a href="{% url 'mark_leave_page' %}">📝 Mark Leave (Today)</a>   ✅ New -->
+            <a href="{% url 'mark_leave' %}">📝 Mark Today's Leave</a>
+
             <a href="{% url 'faculty_attendance_history' %}">📅 View Attendance History</a>
             <a href="{% url 'logout' %}">🚪 Logout</a>
         </nav>

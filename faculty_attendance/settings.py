@@ -86,19 +86,20 @@ WSGI_APPLICATION = "faculty_attendance.wsgi.application"
 #     }
 # }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'wisdom_faculty_attendance',
-#         'USER': 'postgres',
-#         'PASSWORD': 'beeka@2024',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
 DATABASES = {
-    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        # 'NAME': 'wisdom_faculty_attendance',
+        'NAME':'faculty_attendance_local',
+        'USER': 'postgres',
+        'PASSWORD': 'beeka@2024',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
 }
+# DATABASES = {
+#     'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+# }
 
 
 # Password validation

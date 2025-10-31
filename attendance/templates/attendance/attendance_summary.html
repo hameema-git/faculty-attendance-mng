@@ -167,6 +167,12 @@
   background-color: #f9f9f9;
   border-color: #dee2e6;
 }
+@media (max-width: 576px) {
+  .text-center.mb-4.d-flex a.btn {
+    width: 100%;
+  }
+}
+
 
 
     </style>
@@ -194,6 +200,19 @@
             <a href="{% url 'attendance_summary' %}" class="btn btn-secondary">Reset</a>
         </div>
     </form>
+
+    <div class="text-center mb-4 d-flex flex-wrap justify-content-center gap-2">
+        <a href="{% url 'attendance_summary_pdf' %}?month={{ selected_month }}&year={{ selected_year }}&q={{ search_query }}" 
+           class="btn btn-success" 
+           target="_blank">
+            ⬇️ Download PDF
+        </a>
+        <a href="{% url 'attendance_summary_excel' %}?month={{ selected_month }}&year={{ selected_year }}&q={{ search_query }}" 
+           class="btn btn-warning" 
+           target="_blank">
+            📊 Export Excel
+        </a>
+    </div>
 
     <!-- Attendance Table -->
     <div class="table-responsive">

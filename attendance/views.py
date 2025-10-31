@@ -8,6 +8,9 @@ from datetime import date
 from .models import Attendance
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseNotAllowed
+from django.db.models import Sum
+import pandas as pd
+
 
 
 
@@ -485,6 +488,57 @@ def attendance_summary(request):
         )
 
     summary = []
+    # for faculty in faculty_users:
+    #     present_days = Attendance.objects.filter(
+    #         faculty=faculty,
+    #         date__month=selected_month,
+    #         date__year=selected_year,
+    #         status='P',
+    #         approved=True
+    #     ).count()
+
+    #     absent_days = Attendance.objects.filter(
+    #         faculty=faculty,
+    #         date__month=selected_month,
+    #         date__year=selected_year,
+    #         status='A',
+    #         approved=True
+    #     ).count()
+
+    #     leave_days = Attendance.objects.filter(
+    #         faculty=faculty,
+    #         date__month=selected_month,
+    #         date__year=selected_year,
+    #         status='L',
+    #         approved=True
+    #     ).count()
+
+    #     attendance_records = Attendance.objects.filter(
+    #         faculty=faculty,
+    #         date__month=selected_month,
+    #         date__year=selected_year,
+    #         status='P',
+    #         approved=True
+    #     ).values('date', 'hours_worked')
+
+    #     total_hours = 0
+    #     daily_hours = []
+    #     for record in attendance_records:
+    #         hours = record['hours_worked'] or 0
+    #         total_hours += hours
+    #         daily_hours.append({
+    #             'date': record['date'],
+    #             'hours_worked': hours
+    #         })
+
+    #     summary.append({
+    #         'faculty': faculty,
+    #         'present': present_days,
+    #         'absent': absent_days,
+    #         'leave': leave_days,
+    #         'total_hours': total_hours,
+    #         'daily_hours': daily_hours
+    #     })
     for faculty in faculty_users:
         present_days = Attendance.objects.filter(
             faculty=faculty,
@@ -507,10 +561,11 @@ def attendance_summary(request):
             date__month=selected_month,
             date__year=selected_year,
             status='L',
-            approved=True
+            # approved=True
         ).count()
 
-        attendance_records = Attendance.objects.filter(
+        # ✅ Fetch present day details (date + hours)
+        present_records = Attendance.objects.filter(
             faculty=faculty,
             date__month=selected_month,
             date__year=selected_year,
@@ -518,24 +573,29 @@ def attendance_summary(request):
             approved=True
         ).values('date', 'hours_worked')
 
-        total_hours = 0
-        daily_hours = []
-        for record in attendance_records:
-            hours = record['hours_worked'] or 0
-            total_hours += hours
-            daily_hours.append({
-                'date': record['date'],
-                'hours_worked': hours
-            })
+        # ✅ Fetch leave day details (date + reason)
+        leave_records = Attendance.objects.filter(
+            faculty=faculty,
+            date__month=selected_month,
+            date__year=selected_year,
+            status='L',
+            # approved=True
+        ).values('date', 'message')
 
+        # ✅ Calculate total hours
+        total_hours = sum([record['hours_worked'] or 0 for record in present_records])
+
+        # ✅ Append data to summary list
         summary.append({
             'faculty': faculty,
             'present': present_days,
             'absent': absent_days,
             'leave': leave_days,
             'total_hours': total_hours,
-            'daily_hours': daily_hours
+            'present_days': list(present_records),
+            'leave_days': list(leave_records),
         })
+
 
     # Pagination
     paginator = Paginator(summary, 10)# 10 records per page
@@ -562,6 +622,292 @@ def attendance_summary(request):
         'selected_year': selected_year,
         'search_query': search_query,
     })
+
+import io
+import calendar
+from datetime import date
+from django.http import FileResponse
+from django.db.models import Q, Sum
+from django.db import models
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+
+def attendance_summary_pdf(request):
+    today = date.today()
+    selected_month = int(request.GET.get('month', today.month))
+    selected_year = int(request.GET.get('year', today.year))
+    search_query = request.GET.get('q', '').strip()
+
+    month_name = calendar.month_name[selected_month]  # ✅ Convert month number to name
+
+    faculty_users = CustomUser.objects.filter(is_faculty=True)
+    if search_query:
+        faculty_users = faculty_users.filter(
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query) |
+            Q(username__icontains=search_query)
+        )
+
+    buffer = io.BytesIO()
+    pdf = SimpleDocTemplate(
+        buffer, pagesize=landscape(A4), leftMargin=30, rightMargin=30, topMargin=40, bottomMargin=30
+    )
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'TitleStyle', parent=styles['Title'], alignment=1, textColor=colors.teal, fontSize=18, spaceAfter=20
+    )
+
+    elements = []
+    elements.append(Paragraph(f"Attendance Summary – {month_name} {selected_year}", title_style))
+    elements.append(Spacer(1, 12))
+
+    data = [["Sl No", "Faculty", "Present", "Absent", "Leave", "Total Hours Worked"]]
+    for i, faculty in enumerate(faculty_users, start=1):
+        present = Attendance.objects.filter(
+            faculty=faculty, date__month=selected_month, date__year=selected_year, status='P', approved=True
+        ).count()
+        absent = Attendance.objects.filter(
+            faculty=faculty, date__month=selected_month, date__year=selected_year, status='A', approved=True
+        ).count()
+        leave = Attendance.objects.filter(
+            faculty=faculty, date__month=selected_month, date__year=selected_year, status='L', approved=True
+        ).count()
+        total_hours = Attendance.objects.filter(
+            faculty=faculty, date__month=selected_month, date__year=selected_year, approved=True
+        ).aggregate(total=models.Sum('hours_worked'))['total'] or 0
+
+        data.append([
+            str(i),
+            f"{faculty.first_name} {faculty.last_name}",
+            str(present),
+            str(absent),
+            str(leave),
+            str(total_hours)
+        ])
+
+    table = Table(data, repeatRows=1)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.teal),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.lightgrey]),
+    ]))
+
+    elements.append(table)
+    pdf.build(elements)
+
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename=f"attendance_{month_name}_{selected_year}.pdf")
+
+# import io
+# import pandas as pd
+# from django.http import FileResponse, HttpResponse
+# from reportlab.pdfgen import canvas
+# from reportlab.lib.pagesizes import A4
+# from reportlab.lib.units import inch
+
+# def attendance_summary_pdf(request):
+#     today = date.today()
+#     selected_month = int(request.GET.get('month', today.month))
+#     selected_year = int(request.GET.get('year', today.year))
+#     search_query = request.GET.get('q', '').strip()
+
+#     faculty_users = CustomUser.objects.filter(is_faculty=True)
+#     if search_query:
+#         faculty_users = faculty_users.filter(
+#             Q(first_name__icontains=search_query) |
+#             Q(last_name__icontains=search_query) |
+#             Q(username__icontains=search_query)
+#         )
+
+#     buffer = io.BytesIO()
+#     p = canvas.Canvas(buffer, pagesize=A4)
+#     width, height = A4
+
+#     p.setFont("Helvetica-Bold", 14)
+#     p.drawCentredString(width / 2, height - inch, f"Attendance Summary - {selected_month}/{selected_year}")
+#     p.setFont("Helvetica", 10)
+
+#     y = height - 1.5 * inch
+#     for faculty in faculty_users:
+#         present = Attendance.objects.filter(faculty=faculty, date__month=selected_month, date__year=selected_year, status='P').count()
+#         absent = Attendance.objects.filter(faculty=faculty, date__month=selected_month, date__year=selected_year, status='A').count()
+#         leave = Attendance.objects.filter(faculty=faculty, date__month=selected_month, date__year=selected_year, status='L').count()
+
+#         p.drawString(1 * inch, y, f"{faculty.first_name} {faculty.last_name} | P:{present} | A:{absent} | L:{leave}")
+#         y -= 0.3 * inch
+#         if y < 1 * inch:
+#             p.showPage()
+#             y = height - 1 * inch
+
+#     p.showPage()
+#     p.save()
+
+#     buffer.seek(0)
+#     return FileResponse(buffer, as_attachment=True, filename=f"attendance_{selected_month}_{selected_year}.pdf")
+
+import io
+import pandas as pd
+import calendar
+from datetime import date
+from django.http import HttpResponse
+from django.db.models import Q, Sum
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+from openpyxl.utils import get_column_letter
+
+def attendance_summary_excel(request):
+    today = date.today()
+    selected_month = int(request.GET.get('month', today.month))
+    selected_year = int(request.GET.get('year', today.year))
+    search_query = request.GET.get('q', '').strip()
+    month_name = calendar.month_name[selected_month]  # ✅ Convert month number → name
+
+    faculty_users = CustomUser.objects.filter(is_faculty=True)
+    if search_query:
+        faculty_users = faculty_users.filter(
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query) |
+            Q(username__icontains=search_query)
+        )
+
+    data = []
+    for faculty in faculty_users:
+        present = Attendance.objects.filter(
+            faculty=faculty, date__month=selected_month, date__year=selected_year, status='P'
+        ).count()
+        absent = Attendance.objects.filter(
+            faculty=faculty, date__month=selected_month, date__year=selected_year, status='A'
+        ).count()
+        leave = Attendance.objects.filter(
+            faculty=faculty, date__month=selected_month, date__year=selected_year, status='L'
+        ).count()
+        total_hours = Attendance.objects.filter(
+            faculty=faculty, date__month=selected_month, date__year=selected_year, status='P'
+        ).aggregate(Sum('hours_worked'))['hours_worked__sum'] or 0
+
+        data.append({
+            'Faculty Name': f"{faculty.first_name} {faculty.last_name}",
+            'Username': faculty.username,
+            'Days Present': present,
+            'Days Absent': absent,
+            'Leaves Taken': leave,
+            'Total Hours Worked': total_hours,
+        })
+
+    # ✅ Create DataFrame
+    df = pd.DataFrame(data)
+
+    buffer = io.BytesIO()
+    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name=f'{month_name}_{selected_year}')
+
+        # ✅ Get worksheet for styling
+        workbook = writer.book
+        worksheet = writer.sheets[f'{month_name}_{selected_year}']
+
+        # --- Styles ---
+        header_font = Font(bold=True, color="FFFFFF", size=12)
+        header_fill = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
+        center_align = Alignment(horizontal="center", vertical="center")
+        thin_border = Border(
+            left=Side(style='thin'),
+            right=Side(style='thin'),
+            top=Side(style='thin'),
+            bottom=Side(style='thin')
+        )
+
+        # ✅ Apply styles to header
+        for col_num, column_title in enumerate(df.columns, 1):
+            cell = worksheet.cell(row=1, column=col_num)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = center_align
+            cell.border = thin_border
+
+        # ✅ Apply alignment & border to all cells
+        for row in worksheet.iter_rows(min_row=2, max_row=len(df) + 1, min_col=1, max_col=len(df.columns)):
+            for cell in row:
+                cell.alignment = center_align
+                cell.border = thin_border
+
+        # ✅ Auto-adjust column widths
+        for col in worksheet.columns:
+            max_length = 0
+            column = col[0].column  # column number
+            column_letter = get_column_letter(column)
+            for cell in col:
+                try:
+                    if cell.value:
+                        max_length = max(max_length, len(str(cell.value)))
+                except:
+                    pass
+            adjusted_width = (max_length + 4)
+            worksheet.column_dimensions[column_letter].width = adjusted_width
+
+        # ✅ Add title row on top
+        worksheet.insert_rows(1)
+        title_cell = worksheet.cell(row=1, column=1)
+        title_cell.value = f"Faculty Attendance Summary - {month_name} {selected_year}"
+        title_cell.font = Font(bold=True, size=14, color="1F4E78")
+        worksheet.merge_cells(start_row=1, start_column=1, end_row=1, end_column=len(df.columns))
+        title_cell.alignment = Alignment(horizontal="center", vertical="center")
+
+    # ✅ Prepare and return response
+    buffer.seek(0)
+    response = HttpResponse(
+        buffer,
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename=attendance_{month_name}_{selected_year}.xlsx'
+    return response
+
+
+# def attendance_summary_excel(request):
+#     today = date.today()
+#     selected_month = int(request.GET.get('month', today.month))
+#     selected_year = int(request.GET.get('year', today.year))
+#     search_query = request.GET.get('q', '').strip()
+
+#     faculty_users = CustomUser.objects.filter(is_faculty=True)
+#     if search_query:
+#         faculty_users = faculty_users.filter(
+#             Q(first_name__icontains=search_query) |
+#             Q(last_name__icontains=search_query) |
+#             Q(username__icontains=search_query)
+#         )
+
+#     data = []
+#     for faculty in faculty_users:
+#         present = Attendance.objects.filter(faculty=faculty, date__month=selected_month, date__year=selected_year, status='P').count()
+#         absent = Attendance.objects.filter(faculty=faculty, date__month=selected_month, date__year=selected_year, status='A').count()
+#         leave = Attendance.objects.filter(faculty=faculty, date__month=selected_month, date__year=selected_year, status='L').count()
+#         total_hours = Attendance.objects.filter(faculty=faculty, date__month=selected_month, date__year=selected_year, status='P').aggregate(Sum('hours_worked'))['hours_worked__sum'] or 0
+
+#         data.append({
+#             'Faculty': f"{faculty.first_name} {faculty.last_name}",
+#             'Username': faculty.username,
+#             'Present': present,
+#             'Absent': absent,
+#             'Leave': leave,
+#             'Total Hours Worked': total_hours,
+#         })
+
+#     df = pd.DataFrame(data)
+#     buffer = io.BytesIO()
+#     with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+#         df.to_excel(writer, index=False, sheet_name='Attendance')
+
+#     buffer.seek(0)
+#     response = HttpResponse(buffer, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+#     response['Content-Disposition'] = f'attachment; filename=attendance_{selected_month}_{selected_year}.xlsx'
+#     return response
+
 
 
 
@@ -602,6 +948,13 @@ def edit_attendance1(request, attendance_id):
         form = AttendanceForm(instance=attendance)
 
     return render(request, 'attendance/edit_attendance1.html', {'form': form, 'attendance': attendance})
+@login_required
+def view_attendance(request, attendance_id):
+    attendance = get_object_or_404(Attendance, id=attendance_id)
+
+    return render(request, 'attendance/view_attendance.html', {
+        'attendance': attendance
+    })
 
 @login_required
 def edit_attendance2(request, attendance_id):
@@ -660,6 +1013,37 @@ def mark_attendance_page(request):
         'attendance_exists': attendance_exists
     })
 
+@login_required
+def mark_leave_page(request):
+    today = date.today()
+    attendance_exists = Attendance.objects.filter(faculty=request.user, date=today).exists()
+    return render(request, "attendance/mark_leave.html", {
+        'attendance_exists': attendance_exists
+    })
+
+@login_required
+def mark_leave(request):
+    today = date.today()
+
+    if Attendance.objects.filter(faculty=request.user, date=today).exists():
+        messages.warning(request, "You have already marked attendance or leave today.")
+        return redirect('mark_leave_page')
+        # return redirect('mark_leave')
+
+
+    if request.method == 'POST':
+        reason = request.POST.get('reason', '').strip()
+
+        Attendance.objects.create(
+            faculty=request.user,
+            date=today,
+            status='L',
+            message=reason
+        )
+        messages.success(request, "✅ Leave marked successfully for today.")
+        return redirect('faculty_dashboard')
+
+    return render(request, "attendance/mark_leave.html")
 
 
 
