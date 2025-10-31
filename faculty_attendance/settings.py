@@ -86,21 +86,41 @@ WSGI_APPLICATION = "faculty_attendance.wsgi.application"
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        # 'NAME': 'wisdom_faculty_attendance',
-        'NAME':'faculty_attendance_local',
-        'USER': 'postgres',
-        'PASSWORD': 'beeka@2024',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         # 'NAME': 'wisdom_faculty_attendance',
+#         'NAME':'faculty_attendance_local',
+#         'USER': 'postgres',
+#         'PASSWORD': 'beeka@2024',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 # DATABASES = {
 #     'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 # }
 
+# Detect if running on Render (Render sets this environment variable)
+RENDER = os.environ.get('RENDER', None)
+
+if RENDER:
+    # 🟢 Render Production Database (from environment variable)
+    DATABASES = {
+        'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+    }
+else:
+    # 🟡 Local Development Database
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'faculty_attendance_local',
+            'USER': 'postgres',
+            'PASSWORD': 'beeka@2024',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
