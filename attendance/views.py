@@ -585,6 +585,25 @@ def attendance_summary(request):
         # ✅ Calculate total hours
         total_hours = sum([record['hours_worked'] or 0 for record in present_records])
 
+        attendance_records = Attendance.objects.filter(
+            faculty=faculty,
+            date__month=selected_month,
+            date__year=selected_year,
+            status='P',
+            approved=True
+        ).values('date', 'hours_worked')
+
+        total_hours = 0
+        daily_hours = []
+        for record in attendance_records:
+            hours = record['hours_worked'] or 0
+            total_hours += hours
+            daily_hours.append({
+                'date': record['date'],
+                'hours_worked': hours
+            })
+
+
         # ✅ Append data to summary list
         summary.append({
             'faculty': faculty,
@@ -594,6 +613,7 @@ def attendance_summary(request):
             'total_hours': total_hours,
             'present_days': list(present_records),
             'leave_days': list(leave_records),
+            'daily_hours': daily_hours
         })
 
 
