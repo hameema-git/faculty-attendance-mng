@@ -212,6 +212,8 @@ SECRET_KEY = os.getenv("SECRET_KEY", "your-default-secret")  # Use env var or fa
 # ALLOWED_HOSTS = ["*"]  # For now, Render sets it automatically, keep "*"
 DEBUG = True
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
+
 # In production only:
 if not DEBUG:
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
