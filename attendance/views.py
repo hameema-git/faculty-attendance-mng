@@ -120,8 +120,8 @@ def admin_view_attendance(request):
     selected_month = selected_year = None
 
     # 2) Define academic year range
-    academic_start = date(2025, 5, 1)
-    academic_end   = date(2026, 3, 31)
+    academic_start = date(2026, 5, 1)
+    academic_end   = date(2027, 3, 31)
 
     # 3) Base queryset
     qs = Attendance.objects.filter(date__range=(academic_start, academic_end))
@@ -225,8 +225,8 @@ def admin_approve_attendance(request):
     month_year = request.GET.get('month_year')
     selected_month = selected_year = None
 
-    academic_start = date(2025, 5, 1)
-    academic_end = date(2026, 3, 31)
+    academic_start = date(2026, 5, 1)
+    academic_end = date(2027, 3, 31)
 
     pending_attendance = Attendance.objects.filter(approved=False, date__range=(academic_start, academic_end))
 
@@ -318,8 +318,8 @@ def faculty_attendance_history(request):
     search_date = request.GET.get('date', '').strip()
 
     # Academic year range
-    academic_start = date(2025, 5, 1)
-    academic_end   = date(2026, 5, 31)
+    academic_start = date(2026, 5, 1)
+    academic_end   = date(2027, 5, 31)
 
     # Base queryset for this user
     qs = Attendance.objects.filter(
@@ -463,8 +463,8 @@ from django.core.paginator import Paginator
 def attendance_summary(request):
     today = date.today()
 
-    academic_start = date(2025, 5, 1)
-    academic_end = date(2026, 3, 31)
+    academic_start = date(2026, 5, 1)
+    academic_end = date(2027, 3, 31)
 
     try:
         selected_month = int(request.GET.get('month', today.month))
@@ -475,7 +475,7 @@ def attendance_summary(request):
 
     if not (academic_start <= date(selected_year, selected_month, 1) <= academic_end):
         selected_month = 5
-        selected_year = 2025
+        selected_year = 2026
 
     faculty_users = CustomUser.objects.filter(is_faculty=True)
 
